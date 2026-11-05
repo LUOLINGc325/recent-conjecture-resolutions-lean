@@ -33,7 +33,7 @@ jobs:
       - name: Build
         run: |
           set -o pipefail
-          lake build 2>&1 | tee build.log
+          lake build DsBatch 2>&1 | tee build.log
 
       - name: No sorry and no errors in the build log
         run: |

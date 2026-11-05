@@ -3,6 +3,7 @@ open Lake DSL
 
 package ds_lean_batch
 
+@[default_target]
 lean_lib DsBatch
 
 require mathlib from git
