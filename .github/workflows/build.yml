@@ -1,0 +1,110 @@
+name: build
+
+# Build every module, check the build log for `sorry` and errors, scan the sources (comments removed)
+# for escape hatches, and check that every endpoint theorem depends only on the standard axioms.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install elan and the pinned toolchain
+        run: |
+          set -euo pipefail
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -o elan-init.sh
+          sh elan-init.sh -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+          export PATH="$HOME/.elan/bin:$PATH"
+          elan toolchain install "$(cat lean-toolchain)"
+
+      - name: Fetch Mathlib (official cache)
+        run: |
+          for i in 1 2 3 4; do lake exe cache get && break; sleep $((i*15)); done
+
+      - name: Build
+        run: |
+          set -o pipefail
+          lake build 2>&1 | tee build.log
+
+      - name: No sorry and no errors in the build log
+        run: |
+          if grep -nE "declaration uses ['\`]?sorry|(^|[^a-z])error:" build.log; then
+            echo "::error::build log contains sorry or errors"; exit 1
+          fi
+
+      - name: Source scan (comments and strings removed)
+        run: |
+          python3 - <<'PY'
+          import re, sys
+          from pathlib import Path
+          def strip(src):
+              out, i, n, depth = [], 0, len(src), 0
+              while i < n:
+                  if depth == 0 and src.startswith('--', i):
+                      j = src.find('\n', i); i = n if j < 0 else j
+                  elif src.startswith('/-', i):
+                      depth += 1; i += 2
+                  elif depth and src.startswith('-/', i):
+                      depth -= 1; i += 2
+                  elif depth:
+                      out.append('\n' if src[i] == '\n' else ' '); i += 1
+                  elif src[i] == '"':
+                      j = i + 1
+                      while j < n and src[j] != '"':
+                          j += 2 if src[j] == '\\' else 1
+                      out.append('""'); i = j + 1
+                  else:
+                      out.append(src[i]); i += 1
+              return ''.join(out)
+          forbidden = re.compile(
+              r"\b(sorry|admit|native_decide|implemented_by|extern|skipKernelTC|unsafe)\b"
+              r"|^\s*(@\[[^\]]*\]\s*)*((private|protected|noncomputable|unsafe|partial|local|scoped)\s+)*axiom\b"
+              r"|^\s*#(eval|exit|reduce)\b|@\[csimp\]|set_option\s+debug\.",
+              re.M)
+          bad = []
+          for p in sorted(Path('DsBatch').rglob('*.lean')):
+              text = strip(p.read_text(encoding='utf-8'))
+              for m in forbidden.finditer(text):
+                  bad.append(f"{p}:{text.count(chr(10), 0, m.start()) + 1}: {m.group(0).strip()}")
+          print('\n'.join(bad) if bad else 'source scan clean')
+          sys.exit(1 if bad else 0)
+          PY
+
+      - name: Axiom audit of the endpoint theorems
+        run: |
+          set -euo pipefail
+          lake env lean scripts/CheckAxioms.lean 2>&1 | tee axioms.txt
+          python3 - <<'PY'
+          import re, sys
+          text = open('axioms.txt').read()
+          allowed = {'propext', 'Classical.choice', 'Quot.sound'}
+          found = {n: {a.strip() for a in axs.split(',') if a.strip()}
+                   for n, axs in re.findall(r"'([^']+)' depends on axioms:\s*\[([^\]]*)\]", text)}
+          for n in re.findall(r"'([^']+)' does not depend on any axioms", text):
+              found[n] = set()
+          bad = 'error' in text or 'sorryAx' in text
+          for w in [l.strip() for l in open('scripts/ENDPOINTS.txt') if l.strip()]:
+              if w not in found or found[w] - allowed:
+                  print('FAIL', w, sorted(found.get(w, {'missing'}))); bad = True
+              else:
+                  print('OK', w, sorted(found[w]))
+          sys.exit(1 if bad else 0)
+          PY
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs
+          path: |
+            build.log
+            axioms.txt

@@ -1,0 +1,24 @@
+import DsBatch
+
+#print axioms DsBatch.P01.counterexample
+#print axioms DsBatch.P01.mizzi_conjecture_false
+#print axioms DsBatch.P02.counterexample
+#print axioms DsBatch.P02.plcc_false
+#print axioms DsBatch.P03.kappa_proper
+#print axioms DsBatch.P03.chromaticNumber_le_twelve
+#print axioms DsBatch.P04.counterexample
+#print axioms DsBatch.P05.main
+#print axioms DsBatch.P06.main
+#print axioms DsBatch.P07.key31
+#print axioms DsBatch.P07.counterexample
+#print axioms DsBatch.P08.no_comparable_closed_neighborhoods
+#print axioms DsBatch.P08.no_simplicial_vertex
+#print axioms DsBatch.P09.graph_structure
+#print axioms DsBatch.P09.gamma_eq_six
+#print axioms DsBatch.P09.four_edge
+#print axioms DsBatch.P09.bondage_ge_five
+#print axioms DsBatch.P09.teschner_false
+#print axioms DsBatch.P10.graph_structure
+#print axioms DsBatch.P10.total_colouring
+#print axioms DsBatch.P10.list_assignment
+#print axioms DsBatch.P10.counterexample

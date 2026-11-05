@@ -1,0 +1,7 @@
+.lake/
+build/
+*.olean
+infra/state/proxy.out
+infra/state/proxy.pid
+projects/*/state/proxy.out
+__pycache__/
