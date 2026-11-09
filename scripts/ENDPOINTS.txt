@@ -20,3 +20,15 @@ DsBatch.P10.graph_structure
 DsBatch.P10.total_colouring
 DsBatch.P10.list_assignment
 DsBatch.P10.counterexample
+DsBatch.P11.conjecture_refuted
+DsBatch.P12.master_formula
+DsBatch.P12.even_case
+DsBatch.P12.odd_case
+DsBatch.P13.l12_structure
+DsBatch.P13.l12_nonequitable_colouring
+DsBatch.P13.stemock_conjecture_false
+DsBatch.P14.main
+DsBatch.P15.t3_caterpillar
+DsBatch.P15.t3_weight_separation
+DsBatch.P15.t3_chiLa
+DsBatch.P15.leaf_conjecture_false

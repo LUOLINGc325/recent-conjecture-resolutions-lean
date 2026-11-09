@@ -22,3 +22,15 @@ import DsBatch
 #print axioms DsBatch.P10.total_colouring
 #print axioms DsBatch.P10.list_assignment
 #print axioms DsBatch.P10.counterexample
+#print axioms DsBatch.P11.conjecture_refuted
+#print axioms DsBatch.P12.master_formula
+#print axioms DsBatch.P12.even_case
+#print axioms DsBatch.P12.odd_case
+#print axioms DsBatch.P13.l12_structure
+#print axioms DsBatch.P13.l12_nonequitable_colouring
+#print axioms DsBatch.P13.stemock_conjecture_false
+#print axioms DsBatch.P14.main
+#print axioms DsBatch.P15.t3_caterpillar
+#print axioms DsBatch.P15.t3_weight_separation
+#print axioms DsBatch.P15.t3_chiLa
+#print axioms DsBatch.P15.leaf_conjecture_false

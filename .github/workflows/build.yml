@@ -34,8 +34,8 @@ jobs:
         run: |
           set -o pipefail
           : > build.log
-          # P09's kernel checks are memory-heavy: built in parallel they exhaust the runner.
-          for target in DsBatch.P09.Cert4 DsBatch.P09.Cert5 DsBatch.P09.CertOk DsBatch; do
+          # P09's kernel checks and the larger later entries are memory-heavy: built in parallel they exhaust the runner.
+          for target in DsBatch.P09.Cert4 DsBatch.P09.Cert5 DsBatch.P09.CertOk DsBatch.P12.Main DsBatch.P13.Main DsBatch.P14.Main DsBatch.P15.Main DsBatch; do
             lake build "$target" 2>&1 | tee -a build.log
           done
 
